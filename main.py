@@ -16,6 +16,14 @@ ENTRY = (
 LIMIT = 120
 
 
+def _validate_chars(line):
+    """Reject control characters and anything that is not valid UTF-8."""
+    for ch in line:
+        if ord(ch) < 32 or ord(ch) == 127:
+            raise ValueError("entry holds a control character")
+    line.encode("utf-8")
+
+
 def checked(line):
     """Refuse anything the competition gate would refuse."""
     if not line or not line.strip():
@@ -24,10 +32,7 @@ def checked(line):
         raise ValueError("entry is %d chars, over the %d cap" % (len(line), LIMIT))
     if "\n" in line or "\r" in line:
         raise ValueError("entry must be a single line")
-    for ch in line:
-        if ord(ch) < 32 or ord(ch) == 127:
-            raise ValueError("entry holds a control character")
-    line.encode("utf-8")
+    _validate_chars(line)
     return line
 
 
